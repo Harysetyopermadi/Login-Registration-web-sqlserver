@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+    {% load static %}
+<head>
+
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/font-awesome.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+</head>
+
+<style>
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      margin: 0;
+
+  
+    }
+  
+    .content {
+      flex: 1;
+    }
+    .parent {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 70vh; /* Adjust this value to fit your requirements */
+      }
+  </style>
+<body>
+    <div class="form-cover">
+    <div class="parent">
+        <div class="text-center">
+          <h1>Selamat Datang Di Aplikasi</h1>
+          <h1>Monitoring Job Python {{current_user}}</h1>
+        </div>
+      </div>
+      
+    </div>
+
+    
+
+      <footer class="text-white mt-auto" style="background-color: #00a39d;">
+        <div class="text-center p-3" style="background-color: #00a39d;">
+          © 2023 Created at Digital Banking And E-channel Operation Group
+        </div>
+      </footer>
+   
+</body>
+</html>
+{% endblock content %}
+
+
+

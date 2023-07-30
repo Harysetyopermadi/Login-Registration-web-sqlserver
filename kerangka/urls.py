@@ -9,6 +9,8 @@ urlpatterns = [
     path('Registrasi',views.Registrasi,name='registrasi'),
     path('Logout', views.logout, name='logout'),
     path('Login',views.Login,name='login'),
+    path('Scheduler',views.Scheduler,name='scheduler'),
+    path('Listjobrunning',views.Listjobrunning,name='listjobrunning')
     #path('InsertRegistrasi',views.InsertRegistrasi,name='Insertregistrasi'),
     #path('InsertRegistrasi',views.InsertRegistrasi , name='insert_data')
 

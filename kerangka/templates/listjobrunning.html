@@ -1,0 +1,81 @@
+{% extends 'basedashboard.html' %}
+
+<!DOCTYPE html>
+<html lang="en">
+  {% load static %}
+  {% csrf_token %}
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>Orchestrator Python</title>
+    <link rel="stylesheet" href="{% static 'vendors/mdi/css/materialdesignicons.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'vendors/flag-icon-css/css/flag-icon.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'vendors/css/vendor.bundle.base.css' %}" />
+    <link rel="stylesheet" href="{% static 'vendors/font-awesome/css/font-awesome.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'vendors/bootstrap-datepicker/bootstrap-datepicker.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/style_dashboard.css' %}" />
+    <link rel="shortcut icon" href="{% static 'images/favicon.png' %}" />
+  </head>
+ 
+  <body>
+    {% block content %}
+    <h2>halaman Job List{{current_user}} {{email}}</h2>
+    
+    <div style="overflow-x: auto;">
+        <table class="table table-striped" style="min-width: 0%;">
+          <thead>
+            <tr>
+              <th scope="col">Id Projek</th>
+              <th scope="col">Nama Projek</th>
+              <th scope="col">Status Running</th>
+              <th scope="col">Message Log</th>
+              <th scope="col">Tanggal Log</th>
+              <th scope="col">Waktu Mulai Log</th>
+              <th scope="col">Waktu Selesai Log</th>
+              <th scope="col">Tanggal Data</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in listjob %}
+            <tr>
+              <td>{{item.id_project}}</td>
+              <td>{{item.nama_projek}}</td>
+              <td>{{item.status}}</td>
+              <td>{{item.message_log}}</td>
+              <td>{{item.tgl_log}}</td>
+              <td>{{item.waktu_mulai}}</td>
+              <td>{{item.waktu_selesai}}</td>
+              <td>{{item.tanggal_data}}</td>
+            </tr>
+            {% endfor %} 
+          </tbody>
+        </table>
+      </div>
+      
+   
+     <nav aria-label="Page navigation example">
+      <ul class="pagination">
+          {% if listjob.has_previous %}
+              <li class="page-item"><a class="page-link" href="?page=1">First</a></li>
+              <li class="page-item"><a class="page-link" href="?page={{ listjob.previous_page_number }}">Previous</a></li>
+          {% endif %}
+  
+          {% for num in page_range %}
+              {% if listjob.number == num %}
+                  <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+              {% else %}
+                  <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+              {% endif %}
+          {% endfor %}
+  
+          {% if listjob.has_next %}
+              <li class="page-item"><a class="page-link" href="?page={{ listjob.next_page_number }}">Next</a></li>
+              <li class="page-item"><a class="page-link" href="?page={{ listjob.paginator.num_pages }}">Last</a></li>
+          {% endif %}
+      </ul>
+    </nav>
+
+    {% endblock content %}
+  </body>
+</html>

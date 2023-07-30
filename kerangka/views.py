@@ -4,6 +4,8 @@ from django.http import FileResponse
 #from kerangka.models import EmpInsert
 from django.contrib import messages
 from .models import EmpInsert
+from django.core.paginator import Paginator
+from django.db import connection
 
 import time
 # from .models import MyTable
@@ -18,8 +20,16 @@ def Home(request):
     }
     if 'user' in request.session:
         current_user = request.session['user']
-        param = {'current_user': current_user}
-        return render(request, 'home.html', param)
+        context['current_user'] = current_user  # Add current_user to the context dictionary
+        
+        try:
+            user = EmpInsert.objects.get(username=current_user)
+            context['email'] = user.email
+        except EmpInsert.DoesNotExist:
+            # Handle the case where the user does not exist in the database
+            context['email'] = None
+        
+        return render(request, 'home.html', context)
     else:
         return redirect('login')
     
@@ -34,6 +44,96 @@ def Produk(request):
    
     return render(request,'produk.html', context)
 
+def Scheduler(request):
+    context ={
+        'title':title
+    }
+    if 'user' in request.session:
+        current_user = request.session['user']
+        context['current_user'] = current_user  # Add current_user to the context dictionary
+        try:
+            user = EmpInsert.objects.get(username=current_user)
+            context['email'] = user.email
+        except EmpInsert.DoesNotExist:
+            # Handle the case where the user does not exist in the database
+            context['email'] = None
+        with connection.cursor() as cursor:
+            cursor.execute("select * from ms_projek_python")
+            columns = [col[0] for col in cursor.description]
+            listjob = [dict(zip(columns, row)) for row in cursor.fetchall()]
+        
+        records_per_page = 3
+        paginator = Paginator(listjob, records_per_page)
+        page_number = request.GET.get('page')
+        listjob = paginator.get_page(page_number)
+        
+        max_page_count = 3
+        num_pages = paginator.num_pages
+        current_page = listjob.number
+         
+        if num_pages <= max_page_count:
+            page_range = range(1, num_pages + 1)
+        else:
+            half_max = max_page_count // 2
+            if current_page <= half_max:
+                page_range = range(1, max_page_count + 1)
+            elif current_page >= num_pages - half_max:
+                page_range = range(num_pages - max_page_count + 1, num_pages + 1)
+            else:
+                page_range = range(current_page - half_max, current_page + half_max + 1)
+                
+        context['listjob'] = listjob
+        context['page_range'] = page_range 
+
+        
+        return render(request, 'jobscheduler.html', context)
+    else:
+        return redirect('login')
+
+def Listjobrunning(request):
+    context ={
+        'title':title
+    } 
+    if 'user' in request.session:
+        current_user = request.session['user']
+        context['current_user'] = current_user  # Add current_user to the context dictionary
+        try:
+            user = EmpInsert.objects.get(username=current_user)
+            context['email'] = user.email
+        except EmpInsert.DoesNotExist:
+            # Handle the case where the user does not exist in the database
+            context['email'] = None
+        with connection.cursor() as cursor:
+            cursor.execute("select * from ms_log_python_rekon")
+            columns = [col[0] for col in cursor.description]
+            listjob = [dict(zip(columns, row)) for row in cursor.fetchall()]
+        
+        records_per_page = 8
+        paginator = Paginator(listjob, records_per_page)
+        page_number = request.GET.get('page')
+        listjob = paginator.get_page(page_number)
+        
+        max_page_count = 3
+        num_pages = paginator.num_pages
+        current_page = listjob.number
+         
+        if num_pages <= max_page_count:
+            page_range = range(1, num_pages + 1)
+        else:
+            half_max = max_page_count // 2
+            if current_page <= half_max:
+                page_range = range(1, max_page_count + 1)
+            elif current_page >= num_pages - half_max:
+                page_range = range(num_pages - max_page_count + 1, num_pages + 1)
+            else:
+                page_range = range(current_page - half_max, current_page + half_max + 1)
+                
+        context['listjob'] = listjob
+        context['page_range'] = page_range 
+        return render(request, 'listjobrunning.html', context)
+    else:
+        return redirect('login')
+    
 
 
 def Registrasi(request):
@@ -86,13 +186,17 @@ def Login(request):
         uname = request.POST.get('username')
         pwd = request.POST.get('password')
         print(uname)
-        check_user = EmpInsert.objects.filter(username=uname, password=pwd)
-        if check_user:
-            request.session['user'] = uname
+        try:
+            user = EmpInsert.objects.get(username=uname, password=pwd)
+        except EmpInsert.DoesNotExist:
+            user = None
+
+        if user:
+            # If the user exists, store the username and email in the session
+            request.session['user'] = user.username
+            request.session['email'] = user.email
             print("berhasil")
             return redirect('home')
-            #return render(request,'home.html', context)
-            
         else:
             print("gagal")
             messages.error(request, 'Gagal Login')
